@@ -3,47 +3,45 @@
     Master Thesis, Digital Engineering, Bauhaus Universität Weimar
 """
 
-import numpy as np
-import random
-
 """
 As stated in the testGA, the y=target is to minimize:
-	y = f(x1,x2,x3,x4)
-	To asses this one, we use a Fitness function that depends on the analytical results derived from the FEA
-	Fitness(x) = f(w,s,d) 		# Weight, Stress, Displacement
-	We obtain the Fitness value for each chromosomes (x) that form the population.
-
-	Pop contains number of chromosomes
-	Results contains the analytical results from Sofistik: weight(kg/m), stress (MPa), midspan displacement (mm)
-	Penalties contains the penalizations that are applied to the results w.r.t their control values
+    y = f(x1,x2,x3,x4,x5,x6)
+    To asses this one, we use a Fitness function that depends on the analytical results derived from the FEA
+    Fitness(x) = f(w,s,d) 		# Weight, Stress, Displacement
+    We obtain the Fitness value for each chromosomes (x) that form the population.  
+    Pop contains number of chromosomes
+    Results contains the analytical results from Sofistik: weight(kg/m), stress (MPa), midspan displacement (mm)
+    Penalties contains the penalizations that are applied to the results w.r.t their control values
 """
 
-# Fitness of each chromosome is calculated
-def cal_pop_fitness(pop, results,allowable_stress, penalties):
-	weight_score=np.empty(pop)
+import numpy as np
 
-	# Remember results contains Weight, Stress and Displacement in each column
-	for i in range(pop):
-		weight_score[i]=results[i][0]						# real weight
-		stress_ratio = results[i][1] / allowable_stress
-		
-		if stress_ratio < penalties[0][1]:
-			weight_score[i]=weight_score[i]+penalties[0][0]
-		if stress_ratio > penalties[1][1]:
-			weight_score[i]=weight_score[i]+penalties[1][0]
-		if results[i][2] > penalties[2][1]:
-			weight_score[i]=weight_score[i]+penalties[2][0]
-	return weight_score
+
+# Fitness of each chromosome is calculated
+def cal_pop_fitness(results, allowable_stress, penalties):
+    weight_score = np.empty(results.shape[1])
+    # Remember results contains Weight, Stress and Displacement in each column
+    for i in range(results.shape[1]):
+        weight_score[i] = results[i][0]						# real weight
+        stress_ratio = results[i][1] / allowable_stress
+
+        if stress_ratio < penalties[0][1]:
+            weight_score[i] = weight_score[i]+penalties[0][0]
+        if stress_ratio > penalties[1][1]:
+            weight_score[i] = weight_score[i]+penalties[1][0]
+        if results[i][2] > penalties[2][1]:
+            weight_score[i] = weight_score[i]+penalties[2][0]
+    return weight_score
 
 
 def select_mating_pool(population, fitness, num_parents):
-    # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
+    # Select best chromosomes in current generation as parents
     parents = np.empty((num_parents, population.shape[1]))
     for parent_num in range(num_parents):
-        min_fitness_idx = np.where(fitness == np.min(fitness))     # This is minimization problem
+        min_fitness_idx = np.where(fitness == np.min(fitness))    # Minimization problem
         min_fitness_idx = min_fitness_idx[0][0]
-        parents[parent_num, :] = population[min_fitness_idx, :]
-        fitness[min_fitness_idx] = 999999999                       
+        parents[parent_num] = population[min_fitness_idx]         # Best chromosome is add to parent
+        fitness[min_fitness_idx] = 9999                           # Its fitness replaced so is not called again
     return parents
 
 
@@ -51,12 +49,12 @@ def crossover(parents, offspring_size):
     offspring = np.empty(offspring_size)
 
     # Best parents have more chances to be crossovered
-    probability = np.flip(np.arange(1,parents.shape[0]+1))
+    probability = np.flip(np.arange(1, parents.shape[0]+1))
     probability = probability/(np.sum(probability))
-        
+
     for k in range(offspring_size[0]):
         # Crossover takes place at a random point to create offsprings of different parents.
-        crossover_point = np.random.randint(1,offspring_size[1]/2)      # Remember: Last two parameters = const
+        crossover_point = np.random.randint(1, parents.shape[1])
 
         # Index of the first parent to mate.
         father = np.random.choice(np.arange(0, parents.shape[0]), p=probability)
@@ -64,9 +62,11 @@ def crossover(parents, offspring_size):
         mother = np.random.choice(np.arange(0, parents.shape[0]), p=probability)
 
         # There is a chance parents are the same. This reduce diversity and must be avoided.
-        while father == mother:
+        safe_stop = 0          # In case father = mother because there are only two parents.
+        while father == mother & safe_stop < 10:
             father = np.random.choice(np.arange(0, parents.shape[0]), p=probability)
             mother = np.random.choice(np.arange(0, parents.shape[0]), p=probability)
+            safe_stop += 1
 
         # The new offspring will have its first half of its genes taken from the first parent.
         offspring[k, 0:crossover_point] = parents[father, 0:crossover_point]
@@ -74,10 +74,12 @@ def crossover(parents, offspring_size):
         offspring[k, crossover_point:] = parents[mother, crossover_point:]
     return offspring
 
-def mutation(offspring_crossover):
-    # Mutation changes a single gene in each offspring randomly.
-    for idx in range(offspring_crossover.shape[0]):
-        # The random value to be added to the gene.
-        random_value = np.random.uniform(-1.0, 1.0, 1)
-        offspring_crossover[idx, 4] = offspring_crossover[idx, 4] + random_value
+
+# Mutation changes a single gene in each offspring_crossover within the limits.
+def mutation(offspring_crossover, lower_limits, upper_limits):
+    for i in range(offspring_crossover.shape[1]):
+        # A gene is randomly chosen
+        gene = np.random.randint(1, offspring_crossover.shape[1])
+        # The gene mutates
+        offspring_crossover[i, gene] = np.round(np.random.uniform(lower_limits[gene], upper_limits[gene]), decimals=4)
     return offspring_crossover
