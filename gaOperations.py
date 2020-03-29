@@ -77,7 +77,7 @@ def crossover(parents, offspring_size):
 
 # Mutation changes a single gene in each offspring_crossover within the limits.
 def mutation(offspring_crossover, lower_limits, upper_limits):
-    for i in range(offspring_crossover.shape[1]):
+    for i in range(offspring_crossover.shape[0]):
         # A gene is randomly chosen
         gene = np.random.randint(1, offspring_crossover.shape[1])
         # The gene mutates

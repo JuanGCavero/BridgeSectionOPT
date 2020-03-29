@@ -74,8 +74,11 @@ def analyze_section(file):
 def parallel_processing(files):
     start_time = datetime.datetime.now()
 
-    with mp.Pool() as pool:
-        pool.map(analyze_section, files)
+    # with mp.Pool() as pool:
+    #    pool.map(analyze_section, files)
+
+    for file in files:
+        analyze_section(file)
 
     end_time = datetime.datetime.now()
     print("Sofistik calculations = "+str(end_time-start_time))
@@ -94,9 +97,14 @@ def retrieve_results(directory, pop, generation):
     shutil.copyfile(source, destination)
 
     results = []
-    for i in range(pop*3):
-        data = pd.read_excel(source, i+1, index_col=None, usecols=cells[i][0], header=cells[i][1], nrows=0)
-        results.append(data.columns.values[0])
-    # Results are reshaped [Population_size, results(Weight, Stress and Displacement)]
-    results = np.reshape(results, (pop, 3))
+    cells = [["B", 1], ["I", 3], ["E", 2]]
+    w_data = [pd.read_excel(source, sheet_name="W"+str(i), usecols=cells[0][0], header=cells[0][1]) for i in range(1, pop+1)]
+    s_data = [pd.read_excel(source, sheet_name="S"+str(i), usecols=cells[1][0], header=cells[1][1]) for i in range(1, pop+1)]
+    d_data = [pd.read_excel(source, sheet_name="D"+str(i), usecols=cells[2][0], header=cells[2][1]) for i in range(1, pop+1)]
+
+    results.append([w_data[i].columns.values[0] for i in range(0, pop)])
+    results.append([s_data[i].columns.values[0] for i in range(0, pop)])
+    results.append([d_data[i].columns.values[0] for i in range(0, pop)])
+
+    results = np.reshape(np.transpose(results), (4,3))
     return results

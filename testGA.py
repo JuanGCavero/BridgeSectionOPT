@@ -111,10 +111,11 @@ if __name__ == '__main__':
 
         # Calculate the fitness of each chromosome in the population.
         fitness = gaOperations.cal_pop_fitness(results, allowable_stress, penalties)
+        best_fitness = np.min(fitness)
 
         # Selecting the best parents in the population for mating.
         parents = gaOperations.select_mating_pool(new_population, fitness, num_parents_mating)
-        print(parents)
+
         # Generating next generation using crossover.
         offspring_crossover = gaOperations.crossover(parents, offspring_size=(pop_size[0]-parents.shape[0], genes))
 
@@ -138,7 +139,7 @@ if __name__ == '__main__':
     gaSofiLink.parallel_processing(file_names)
 
     results = gaSofiLink.retrieve_results(directory, new_population.shape[0], (number_generations+1))
-    fitness = gaOperations.cal_pop_fitness(new_population.shape[0], results, allowable_stress, penalties)
+    fitness = gaOperations.cal_pop_fitness(results, allowable_stress, penalties)
     best_fitness = np.min(fitness)
     # Then return the index of that solution corresponding to the best fitness.
     parents = gaOperations.select_mating_pool(new_population, fitness, num_parents_mating)
