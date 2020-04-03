@@ -13,9 +13,11 @@ import multiprocessing as mp
 
 
 def copy_geometry_files(directory):
-    source = directory+r"\SimpleAnalysis"
+    # Create folder if it does not exist
     if not os.path.exists(directory+r"\PopulationMasterFiles"):
         os.mkdir(directory+r"\PopulationMasterFiles")
+
+    source = directory+r"\SimpleAnalysis"
     destination = directory+r"\PopulationMasterFiles"
     # Copy all files from SimpleAnalysis to PopulationMasterFiles for the shake of clearliness
     src_files = os.listdir(source)
@@ -25,6 +27,9 @@ def copy_geometry_files(directory):
 
 # Parameters must be transfer to Sofistik
 def parameters_to_Sofistik(population, directory, parameters):
+    # Create folder if it does not exist
+    if not os.path.exists(directory+r"\PopulationMasterFiles\PopulationParameters"):
+        os.mkdir(directory+r"\PopulationMasterFiles\PopulationParameters")
     for k, chromosome in enumerate(population):
         # The string starts with the Head title of the file
         row = '$PROG AQUA","HEAD Parameters\n'
@@ -74,9 +79,11 @@ def analyze_section(file):
 def parallel_processing(files):
     start_time = datetime.datetime.now()
 
-    # with mp.Pool() as pool:
+    # Parallel processing (uncomment next two lines to activate it)
+    #with mp.Pool() as pool:
     #    pool.map(analyze_section, files)
 
+    # Serial processing (ensures correct working)
     for file in files:
         analyze_section(file)
 
@@ -106,5 +113,10 @@ def retrieve_results(directory, pop, generation):
     results.append([s_data[i].columns.values[0] for i in range(0, pop)])
     results.append([d_data[i].columns.values[0] for i in range(0, pop)])
 
-    results = np.reshape(np.transpose(results), (4,3))
+    results = np.reshape(np.transpose(results), (pop,3))
     return results
+
+
+def store_fitness(directory, fitness, generation):
+    print(fitness, file=open(directory+r"\PopulationMasterFiles\OptResults\fitness"+str(generation)+".txt", 'w'))
+

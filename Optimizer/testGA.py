@@ -18,7 +18,7 @@ The y=target is to minimize a function (too complex to be defined in a mathemati
     y = f(x1,x2,x3,x4,x5,x6):
         where xi are the design parameter constrains of a bridge cross section [meters]:
         - Beam_Height           [0.30 - 0.60]
-        - Beam_Thickness        [0.10 - 0.30]
+        - Beam_Thickness        [0.01 - 0.04]
         - Lane_Width            [1.50]
         - Parapet_Thickness     [0.10 - 0.16]
         - Parapet_Width         [0.30 - 0.60]
@@ -49,8 +49,8 @@ import gaOperations
 # Chronometer
 start_time = datetime.datetime.now()
 
-# Directory = os.path.dirname(os.path.abspath(__file__))
-directory = r"C:\Users\juan_\Documents\Digital_Engineering\Semester_5\Masther_Thesis\Dynamo_v\simpleOPT_v6"
+directory = os.path.dirname(os.path.abspath(__file__))
+#directory = r"C:\Users\juan_\Documents\Digital_Engineering\Semester_5\Masther_Thesis\Dynamo_v\simpleOPT_v6 - Report"
 
 # File from Dynamo: Parameters
 parameters = []
@@ -84,10 +84,10 @@ penalties = [[min_penalty_stress, min_stress_ratio],
 # Files to run FEA in Sofistik are copied (they will be modified), so originals are conserved.
 gaSofiLink.copy_geometry_files(directory)
 
-# GA attributes
+# GA settings
 genes = len(parameters)
 num_parents_mating = int(chromosomes/2)   # For many chromosomes, chromosomes/2 might not be the best n#.
-pop_size = (chromosomes, genes)  # Population is formed of chromosomes, which consist in genes.
+pop_size = (chromosomes, genes)           # Population are made of chromosomes, which consist in genes.
 
 # Creating the initial population
 new_population = np.round(np.random.uniform(lower_limits, upper_limits, size=pop_size), decimals=4)
@@ -110,11 +110,15 @@ if __name__ == '__main__':
         results = gaSofiLink.retrieve_results(directory, new_population.shape[0], generation)
 
         # Calculate the fitness of each chromosome in the population.
-        fitness = gaOperations.cal_pop_fitness(results, allowable_stress, penalties)
-        best_fitness = np.min(fitness)
+        fitness_value = gaOperations.calc_fitness(results, allowable_stress, penalties)
+        print(fitness_value)
+        best_fitness = np.min(fitness_value)
+
+        # Stores fitness values in folder
+        gaSofiLink.store_fitness(directory, fitness_value, generation)
 
         # Selecting the best parents in the population for mating.
-        parents = gaOperations.select_mating_pool(new_population, fitness, num_parents_mating)
+        parents = gaOperations.select_parents(new_population, fitness_value, num_parents_mating)
 
         # Generating next generation using crossover.
         offspring_crossover = gaOperations.crossover(parents, offspring_size=(pop_size[0]-parents.shape[0], genes))
@@ -139,13 +143,18 @@ if __name__ == '__main__':
     gaSofiLink.parallel_processing(file_names)
 
     results = gaSofiLink.retrieve_results(directory, new_population.shape[0], (number_generations+1))
-    fitness = gaOperations.cal_pop_fitness(results, allowable_stress, penalties)
-    best_fitness = np.min(fitness)
+    fitness_value = gaOperations.calc_fitness(results, allowable_stress, penalties)
+    best_fitness = np.min(fitness_value)
+    gaSofiLink.store_fitness(directory, fitness_value, number_generations)
     # Then return the index of that solution corresponding to the best fitness.
-    parents = gaOperations.select_mating_pool(new_population, fitness, num_parents_mating)
+    parents = gaOperations.select_parents(new_population, fitness_value, num_parents_mating)
 
     print("\nBest solution : ", parents[0])
     print("Fitness = ", best_fitness)
+
+    # Save optimized parameters
+    opt_parameters = ''.join(str(e)+"\n" for e in parents[0])
+    print(opt_parameters, file=open(directory+r"\toDynamo.txt", 'w'))
 
     end_time = datetime.datetime.now()
     print("\nProcess duration = ", str(end_time-start_time))

@@ -18,10 +18,10 @@ import numpy as np
 
 
 # Fitness of each chromosome is calculated
-def cal_pop_fitness(results, allowable_stress, penalties):
-    weight_score = np.empty(results.shape[1])
+def calc_fitness(results, allowable_stress, penalties):
+    weight_score = np.empty(results.shape[0])
     # Remember results contains Weight, Stress and Displacement in each column
-    for i in range(results.shape[1]):
+    for i in range(results.shape[0]):
         weight_score[i] = results[i][0]						# real weight
         stress_ratio = results[i][1] / allowable_stress
 
@@ -34,7 +34,7 @@ def cal_pop_fitness(results, allowable_stress, penalties):
     return weight_score
 
 
-def select_mating_pool(population, fitness, num_parents):
+def select_parents(population, fitness, num_parents):
     # Select best chromosomes in current generation as parents
     parents = np.empty((num_parents, population.shape[1]))
     for parent_num in range(num_parents):
