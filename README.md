@@ -1,2 +1,2 @@
 # BridgeSectionOPT
-Optimization of bridge cross section using GA and parametric design (Revit and Sofistik)
+Optimization of bridge cross sections using GA and parametric design (Revit and Sofistik)
