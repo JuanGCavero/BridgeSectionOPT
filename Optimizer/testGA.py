@@ -40,6 +40,7 @@ Genetic algorithm parameters:
 import numpy as np
 import datetime
 import os
+import copy
 
 # Import definitions
 import gaSofiLink
@@ -49,8 +50,8 @@ import gaOperations
 # Chronometer
 start_time = datetime.datetime.now()
 
-directory = os.path.dirname(os.path.abspath(__file__))
-#directory = r"C:\Users\juan_\Documents\Digital_Engineering\Semester_5\Masther_Thesis\Dynamo_v\simpleOPT_v6 - Report"
+#directory = os.path.dirname(os.path.abspath(__file__))
+directory = r"C:\Users\juan_\Documents\Digital_Engineering\Semester_5\Masther_Thesis\Dynamo_v\simpleOPT_v6 - Report"
 
 # File from Dynamo: Parameters
 parameters = []
@@ -90,70 +91,82 @@ num_parents_mating = int(chromosomes/2)   # For many chromosomes, chromosomes/2 
 pop_size = (chromosomes, genes)           # Population are made of chromosomes, which consist in genes.
 
 # Creating the initial population
+print("Initialize Population")
 new_population = np.round(np.random.uniform(lower_limits, upper_limits, size=pop_size), decimals=4)
 
 if __name__ == '__main__':
+    
+    # Link parameters to Sofistik
+    gaSofiLink.parameters_to_Sofistik(new_population, directory, parameters)
 
-    for generation in range(number_generations):
-        print("Generation : ", generation+1)
+    # Sofistik master files are created
+    file_names = gaSofiLink.create_sofistik_master_file(directory, new_population.shape[0], 0)
+
+    # Sections are anaized by Sofistik
+    print("Evaluate Population...")
+    gaSofiLink.parallel_processing(file_names, 0)
+
+    # Results from Sofistik are restrieved (Sofistik stores them in an excel)
+    results = gaSofiLink.retrieve_results(directory, new_population.shape[0], 0)
+
+    # Calculate the fitness of each chromosome in the population.
+    fitness_value = gaOperations.calc_fitness(results, allowable_stress, penalties)
+    fitness_value_copy = copy.deepcopy(fitness_value)
+    print("Fitness: ",fitness_value)
+    print("\nBest fitness: ", np.min(fitness_value))
+
+    # Stores fitness values in folder
+    gaSofiLink.store_fitness(directory, fitness_value, 0)
+
+    # After evaluation, the loop starts
+    for generation in range(1,number_generations):
+        print("\nGeneration:", generation)
+
+        # Selecting the best parents in the population for mating
+        parents = gaOperations.select_parents(new_population, fitness_value, num_parents_mating)
+
+        # Generateoffspring using crossover
+        offspring_crossover = gaOperations.crossover(parents[0], offspring_size=(pop_size[0]-parents[0].shape[0], genes))
+
+        # Modify offsrping using mutation
+        offspring_mutation = gaOperations.mutation(offspring_crossover, lower_limits, upper_limits)
+
+        # Creating the new population based on the parents and offspring
+        new_population[0:parents[0].shape[0], :] = parents[0]
+        new_population[parents[0].shape[0]:, :] = offspring_mutation
 
         # Link parameters to Sofistik
         gaSofiLink.parameters_to_Sofistik(new_population, directory, parameters)
 
         # Sofistik master files are created
-        file_names = gaSofiLink.create_sofistik_master_file(directory, new_population.shape[0])
+        file_names = gaSofiLink.create_sofistik_master_file(directory, new_population.shape[0], generation)
 
-        # Sections are anaized by Sofistik
-        gaSofiLink.parallel_processing(file_names)
+        # Sections are analized by Sofistik
+        print("Evaluate Population...")
+        gaSofiLink.parallel_processing(file_names, generation)
 
-        # Results from Sofistik are restrieved (Sofistik stores them in an excel)
+        # Results from Sofistik are retrieved (Sofistik stores them in an excel)
         results = gaSofiLink.retrieve_results(directory, new_population.shape[0], generation)
 
         # Calculate the fitness of each chromosome in the population.
         fitness_value = gaOperations.calc_fitness(results, allowable_stress, penalties)
-        print(fitness_value)
-        best_fitness = np.min(fitness_value)
+
+        fitness_value = np.concatenate((fitness_value_copy[parents[1]], fitness_value), axis=0)
+        fitness_value_copy = copy.deepcopy(fitness_value)
 
         # Stores fitness values in folder
         gaSofiLink.store_fitness(directory, fitness_value, generation)
 
-        # Selecting the best parents in the population for mating.
-        parents = gaOperations.select_parents(new_population, fitness_value, num_parents_mating)
-
-        # Generating next generation using crossover.
-        offspring_crossover = gaOperations.crossover(parents, offspring_size=(pop_size[0]-parents.shape[0], genes))
-
-        # Adding some variations to the offsrping using mutation. Not implemented yet
-        offspring_mutation = gaOperations.mutation(offspring_crossover, lower_limits, upper_limits)
-
-        # Creating the new population based on the parents and offspring.
-        new_population[0:parents.shape[0], :] = parents
-        new_population[parents.shape[0]:, :] = offspring_mutation
+        # Find index for minimal fitness values
+        min_fit_idx = np.where(fitness_value == np.min(fitness_value))
+        min_fit_idx = min_fit_idx[0][0]
 
         # The best result in the current iteration.
-        print("\nBest result : ", new_population[0])
-        print("Fitness = ", best_fitness)
-
-    # Getting the best solution after iterating finishing all generations.
-    # At first, the fitness is calculated for each solution in the final generation.
-    gaSofiLink.parameters_to_Sofistik(new_population, directory, parameters)
-    print("Generation : ", number_generations)
-
-    file_names = gaSofiLink.create_sofistik_master_file(directory, new_population.shape[0])
-    gaSofiLink.parallel_processing(file_names)
-
-    results = gaSofiLink.retrieve_results(directory, new_population.shape[0], (number_generations+1))
-    fitness_value = gaOperations.calc_fitness(results, allowable_stress, penalties)
-    best_fitness = np.min(fitness_value)
-    gaSofiLink.store_fitness(directory, fitness_value, number_generations)
-    # Then return the index of that solution corresponding to the best fitness.
-    parents = gaOperations.select_parents(new_population, fitness_value, num_parents_mating)
-
-    print("\nBest solution : ", parents[0])
-    print("Fitness = ", best_fitness)
+        print("Fitness values of generation: ", fitness_value)
+        print("\nBest fitness: ", np.min(fitness_value)," for = ", new_population[min_fit_idx])
 
     # Save optimized parameters
-    opt_parameters = ''.join(str(e)+"\n" for e in parents[0])
+    opt_parameters = ''.join(str(e)+"\n" for e in new_population[min_fit_idx])
     print(opt_parameters, file=open(directory+r"\toDynamo.txt", 'w'))
 
     end_time = datetime.datetime.now()

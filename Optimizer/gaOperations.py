@@ -37,12 +37,14 @@ def calc_fitness(results, allowable_stress, penalties):
 def select_parents(population, fitness, num_parents):
     # Select best chromosomes in current generation as parents
     parents = np.empty((num_parents, population.shape[1]))
+    old_parent_idx = []
     for parent_num in range(num_parents):
         min_fitness_idx = np.where(fitness == np.min(fitness))    # Minimization problem
         min_fitness_idx = min_fitness_idx[0][0]
         parents[parent_num] = population[min_fitness_idx]         # Best chromosome is add to parent
+        old_parent_idx.append(min_fitness_idx)
         fitness[min_fitness_idx] = 9999                           # Its fitness replaced so is not called again
-    return parents
+    return [parents, old_parent_idx]
 
 
 def crossover(parents, offspring_size):
