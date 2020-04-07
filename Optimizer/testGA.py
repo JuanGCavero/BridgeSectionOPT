@@ -50,8 +50,9 @@ import gaOperations
 # Chronometer
 start_time = datetime.datetime.now()
 
-#directory = os.path.dirname(os.path.abspath(__file__))
-directory = r"C:\Users\juan_\Documents\Digital_Engineering\Semester_5\Masther_Thesis\Dynamo_v\simpleOPT_v6 - Report"
+# Database
+directory = os.path.dirname(os.path.abspath(__file__))
+#directory = r"C:\Users\juan_\Documents\Digital_Engineering\Semester_5\Masther_Thesis\Dynamo_v\simpleOPT_v6 - Report"
 
 # File from Dynamo: Parameters
 parameters = []
