@@ -1,0 +1,92 @@
+<Workspace Version="1.3.3.4111" X="72.564215362806" Y="-31.8957014078961" zoom="0.847618571998227" ScaleFactor="1" Name="DAT.WriteDataToFile" Description="Given a header and a body as a list this node will generate a DAT Sofistik File" ID="e518a263-ac4f-41cc-a5a1-0adcacc4c803" Category="SofiLink.Core.File.DAT">
+  <NamespaceResolutionMap>
+    <ClassMap partialName="String" resolvedName="DSCore.String" assemblyName="DSCoreNodes.dll" />
+    <ClassMap partialName="FilePath" resolvedName="DSCore.IO.FilePath" assemblyName="DSCoreNodes.dll" />
+  </NamespaceResolutionMap>
+  <Elements>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="20e0de7a-3e50-460a-8bc0-ec25d1fb4959" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="214.4" y="207.2" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="filepath" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="7e38398c-494b-4c3d-852a-2efab2d332a5" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="214.4" y="272" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="program" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="a6cf743a-c2e1-464b-b508-735c3e9d3ded" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="215.73901297114" y="340.4" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="header" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="96255e82-367e-4624-8d67-e37a86305d94" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="217.583659984183" y="404.063805851823" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="body" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="eafebbde-3156-4615-ac15-d0ab99f76f83" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="CSV.WriteToFile" x="705.982252455754" y="242.680174611663" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="DSCoreNodes.dll" function="DSCore.IO.CSV.WriteToFile@string,var[][]">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="6630f9f7-e38c-4fe6-9b63-015710816d79" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="707.73269269392" y="358.747989508448" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="str" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <PythonNodeModels.PythonNode guid="240767d6-63cc-46dd-ae7e-95e8668a51d3" type="PythonNodeModels.PythonNode" nickname="ListToSofistik" x="454.25595587115" y="301.899592412932" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="3">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <PortInfo index="2" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+#Assign your output to the OUT variable.
+OUT = ["$prog "+IN[0], "HEAD Testversion SofiLink", "\n"]
+
+#try:
+if True:
+
+	if len(IN[1])==len(IN[2])+1:
+		# header string
+		OUT.append('\t'.join(IN[1]))
+		
+		# check for consistency and determine body length
+		blength = None
+		body = IN[2]
+		for i in range(len(body)):
+			if isinstance(body[i], list) and blength is None:
+				blength = len(body[i])
+			elif isinstance(body[i], list) and blength != len(body[i]):
+				OUT = "Length of lists in body are not consistent."
+				break
+				
+		# if not list copy value in list		
+		for i in range(len(body)):		
+			if not isinstance(body[i], list):
+				body[i] = [body[i]] * blength
+
+		# Transpose body lists
+		body = map(list,map(None,*body))
+		# write output string
+		[OUT.append('\t' + '\t'.join(map(str, line))) for line in body]
+			
+	else:
+		OUT =  "Header and body length are not consistent."
+
+#except:
+#	OUT = "Error: header or body might be not a list."
+
+OUT</Script>
+    </PythonNodeModels.PythonNode>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="20e0de7a-3e50-460a-8bc0-ec25d1fb4959" start_index="0" end="eafebbde-3156-4615-ac15-d0ab99f76f83" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="7e38398c-494b-4c3d-852a-2efab2d332a5" start_index="0" end="240767d6-63cc-46dd-ae7e-95e8668a51d3" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="a6cf743a-c2e1-464b-b508-735c3e9d3ded" start_index="0" end="240767d6-63cc-46dd-ae7e-95e8668a51d3" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="96255e82-367e-4624-8d67-e37a86305d94" start_index="0" end="240767d6-63cc-46dd-ae7e-95e8668a51d3" end_index="2" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="240767d6-63cc-46dd-ae7e-95e8668a51d3" start_index="0" end="6630f9f7-e38c-4fe6-9b63-015710816d79" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="240767d6-63cc-46dd-ae7e-95e8668a51d3" start_index="0" end="eafebbde-3156-4615-ac15-d0ab99f76f83" end_index="1" portType="0" />
+  </Connectors>
+  <Notes>
+    <Dynamo.Graph.Notes.NoteModel guid="067f261d-ff5c-4c1b-9968-f47f485fc9e2" text="Rearrages data in an array. Checks the header and body for consistency. Further copys default values for each entry" x="378.772795504479" y="413.292941401852" />
+  </Notes>
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="17.034891221023" eyeY="72.4416454683278" eyeZ="22.1939415043898" lookX="33.236946105957" lookY="-33.6270217895508" lookZ="-8.72614097595215" upX="0.512548863887787" upY="0.848048090934753" upZ="-0.134566321969032" />
+  </Cameras>
+</Workspace>

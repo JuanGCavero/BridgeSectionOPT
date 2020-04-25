@@ -489,26 +489,6 @@
       "Description": "A function output, use with custom nodes"
     },
     {
-      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
-      "NodeType": "CodeBlockNode",
-      "Code": "\".\\\\axis.dat\";",
-      "Id": "0b66ca6d556f4221a5d1cfde604299f9",
-      "Inputs": [],
-      "Outputs": [
-        {
-          "Id": "d383f95b56994c448983d0507f56be98",
-          "Name": "",
-          "Description": "Value of expression at line 1",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        }
-      ],
-      "Replication": "Disabled",
-      "Description": "Allows for DesignScript code to be authored directly"
-    },
-    {
       "ConcreteType": "Dynamo.Graph.Nodes.CustomNodes.Symbol, DynamoCore",
       "NodeType": "InputNode",
       "Parameter": {
@@ -549,6 +529,32 @@
       "Outputs": [
         {
           "Id": "649cdab43f5a4c409001f230fda7ca0f",
+          "Name": "",
+          "Description": "Symbol",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "A function parameter, use with custom nodes.\r\n\r\nYou can specify the type and default value for parameter. E.g.,\r\n\r\ninput : var[]..[]\r\nvalue : bool = false"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CustomNodes.Symbol, DynamoCore",
+      "NodeType": "InputNode",
+      "Parameter": {
+        "Name": "filepath",
+        "TypeName": "string",
+        "TypeRank": 0,
+        "DefaultValue": "\".\\axis.dat\"",
+        "Description": ""
+      },
+      "Id": "53b538164c5e48b9a1a01ab07f968dd3",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "50155237d7a445d887b1a22f388351ad",
           "Name": "",
           "Description": "Symbol",
           "UsingDefaultValue": false,
@@ -648,11 +654,6 @@
       "Id": "ee7a1010c74f44dca24f8c61ef8f37da"
     },
     {
-      "Start": "d383f95b56994c448983d0507f56be98",
-      "End": "6a5eed72f9d5440c9a18bf430a7f6c33",
-      "Id": "2ae35ec12af644c48e670258e553463d"
-    },
-    {
       "Start": "6b89701eec0e42d8a7e572ee6958880a",
       "End": "2cdf362ab67b4fb19769dddbd730ce16",
       "Id": "58c4afb0e9a84085a0733a97304f479d"
@@ -666,6 +667,11 @@
       "Start": "649cdab43f5a4c409001f230fda7ca0f",
       "End": "801e8e1eacb148e1883a3785eb5a1a00",
       "Id": "113e966e0ada49209a91d40e02d2aea9"
+    },
+    {
+      "Start": "50155237d7a445d887b1a22f388351ad",
+      "End": "6a5eed72f9d5440c9a18bf430a7f6c33",
+      "Id": "9aee19a762bd414bbf01d1ce5a3c71ea"
     }
   ],
   "Dependencies": [],
@@ -779,7 +785,7 @@
         "IsSetAsInput": false,
         "IsSetAsOutput": false,
         "Excluded": false,
-        "X": 5.76280068574795,
+        "X": 5.39524126199342,
         "Y": 396.566533342899
       },
       {
@@ -804,22 +810,12 @@
       },
       {
         "ShowGeometry": true,
-        "Name": "Code Block",
-        "Id": "0b66ca6d556f4221a5d1cfde604299f9",
-        "IsSetAsInput": false,
-        "IsSetAsOutput": false,
-        "Excluded": false,
-        "X": 1296.8883045139619,
-        "Y": 217.21108109639883
-      },
-      {
-        "ShowGeometry": true,
         "Name": "Input",
         "Id": "a2ee6fe9715249c482db34d43157699f",
         "IsSetAsInput": false,
         "IsSetAsOutput": false,
         "Excluded": false,
-        "X": 5.57448591684692,
+        "X": 5.39524126199342,
         "Y": 471.755290342683
       },
       {
@@ -829,8 +825,18 @@
         "IsSetAsInput": false,
         "IsSetAsOutput": false,
         "Excluded": false,
-        "X": 7.08862821893774,
+        "X": 5.39524126199342,
         "Y": 544.786181599051
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Input",
+        "Id": "53b538164c5e48b9a1a01ab07f968dd3",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 5.39524126199342,
+        "Y": -81.203150768288424
       }
     ],
     "Annotations": [
@@ -849,8 +855,8 @@
         "Background": "#FFC1D676"
       }
     ],
-    "X": -1110.9146726700324,
-    "Y": -110.16970425985869,
-    "Zoom": 1.1950665016129656
+    "X": 274.93275244703131,
+    "Y": 286.29064896410637,
+    "Zoom": 1.9373927061996339
   }
 }

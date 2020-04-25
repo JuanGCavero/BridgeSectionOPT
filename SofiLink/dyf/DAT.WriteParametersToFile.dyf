@@ -336,16 +336,22 @@
       "Description": "Runs an embedded IronPython script."
     },
     {
-      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
-      "NodeType": "CodeBlockNode",
-      "Code": "\".\\\\parameters.dat\";",
-      "Id": "ad625f06f71e43af888f4d8107fb7a2a",
+      "ConcreteType": "Dynamo.Graph.Nodes.CustomNodes.Symbol, DynamoCore",
+      "NodeType": "InputNode",
+      "Parameter": {
+        "Name": "filepath",
+        "TypeName": "string",
+        "TypeRank": 0,
+        "DefaultValue": "\".\\parameters.dat\"",
+        "Description": ""
+      },
+      "Id": "f5d35aba70414a15a5709cea409da2f5",
       "Inputs": [],
       "Outputs": [
         {
-          "Id": "63afc4def53d48dc84a63a3736f86b32",
+          "Id": "35a1ee268ce443fab574079318d24384",
           "Name": "",
-          "Description": "Value of expression at line 1",
+          "Description": "Symbol",
           "UsingDefaultValue": false,
           "Level": 2,
           "UseLevels": false,
@@ -353,7 +359,7 @@
         }
       ],
       "Replication": "Disabled",
-      "Description": "Allows for DesignScript code to be authored directly"
+      "Description": "A function parameter, use with custom nodes.\r\n\r\nYou can specify the type and default value for parameter. E.g.,\r\n\r\ninput : var[]..[]\r\nvalue : bool = false"
     }
   ],
   "Connectors": [
@@ -408,9 +414,9 @@
       "Id": "bfc92e552dea4726aa000350d4937f06"
     },
     {
-      "Start": "63afc4def53d48dc84a63a3736f86b32",
+      "Start": "35a1ee268ce443fab574079318d24384",
       "End": "9ae587a5ad424f46b66d18e451b98f99",
-      "Id": "0e39b795716942aa8763eb61daf8467b"
+      "Id": "4fe6ead18ed349aca5b591ac4991eda1"
     }
   ],
   "Dependencies": [],
@@ -529,18 +535,18 @@
       },
       {
         "ShowGeometry": true,
-        "Name": "Code Block",
-        "Id": "ad625f06f71e43af888f4d8107fb7a2a",
+        "Name": "Input",
+        "Id": "f5d35aba70414a15a5709cea409da2f5",
         "IsSetAsInput": false,
         "IsSetAsOutput": false,
         "Excluded": false,
-        "X": 995.89856591194575,
-        "Y": 192.72352497923956
+        "X": 206.20428520030242,
+        "Y": 168.21764065760095
       }
     ],
     "Annotations": [],
-    "X": -444.34271564980241,
-    "Y": -216.37651926773032,
-    "Zoom": 1.0620727094813691
+    "X": -73.7374479798624,
+    "Y": 84.717613497565935,
+    "Zoom": 0.83390708477576414
   }
 }
