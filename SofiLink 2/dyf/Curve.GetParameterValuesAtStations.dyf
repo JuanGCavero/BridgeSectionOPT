@@ -1,0 +1,97 @@
+<Workspace Version="1.3.3.4111" X="-170.048060872294" Y="128.734557129262" zoom="0.555272119445999" ScaleFactor="1" Name="Curve.GetParameterValuesAtStations" Description="This Node is based on the definition of a start and end parameter of the structural framing family. It returns the parameter values at the stations from a set of curves and elements." ID="e9949c57-8a80-4593-b121-3195ab56e359" Category="SofiLink.Geometry">
+  <NamespaceResolutionMap>
+    <ClassMap partialName="Element" resolvedName="Revit.Elements.Element" assemblyName="RevitNodes.dll" />
+    <ClassMap partialName="Curve" resolvedName="Autodesk.DesignScript.Geometry.Curve" assemblyName="ProtoGeometry.dll" />
+  </NamespaceResolutionMap>
+  <Elements>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="fc5c85de-589e-4a66-91e2-2ae4a2dc1788" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="Element.GetParameterValueByName" x="964.39118651303" y="236" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="RevitNodes.dll" function="Revit.Elements.Element.GetParameterValueByName@string">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <PythonNodeModels.PythonNode guid="cc33e182-312b-4bbe-b47b-341a76392551" type="PythonNodeModels.PythonNode" nickname="Curve.ParametersAtStations" x="1320.61664140159" y="373.993628691426" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="2">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+#Assign your output to the OUT variable.
+if isinstance(IN[0], list):
+	oldlength = 0
+	stations = []
+	values = []
+	for curve, endvals in zip(IN[0],IN[1]):
+		stations.append(oldlength)
+		stations.append(round(oldlength + curve.Length, 3))
+		values.append(endvals[0])
+		values.append(endvals[-1])
+		oldlength = stations[-1]
+	
+	OUT = (stations, values)
+else:
+	OUT = ([0, IN[0].Length],IN[1])
+	
+</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="9d1c5f78-ab50-4103-b4a1-091bf2b5c414" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="338.4" y="239.2" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="elements:Element[]" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="76f2a264-3114-4ea2-914c-4a888bcfd49e" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="339.2" y="303.2" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="curves:Curve[]" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="b1d1378a-7078-4ba5-a159-e90c91d0d9e6" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="338.470425443667" y="400.028087577327" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="parameters:var[]" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <PythonNodeModels.PythonNode guid="b3fb51ad-2724-4687-bd54-3fdc8f2fa0a0" type="PythonNodeModels.PythonNode" nickname="Parameters for each element" x="679.2" y="326.4" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="2">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+#Assign your output to the OUT variable.
+
+if isinstance(IN[0],list):
+	OUT = []
+	[OUT.append(IN[1]) for element in IN[0]]
+else:
+	OUT = IN[1]		
+OUT</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="8ecb5571-e537-4b58-a52b-21ebc1fc2b23" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="1812.72878338279" y="342.953115727003" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="stations" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="c1ab7aa6-bdaf-4453-bf34-3f891a499339" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Code Block" x="1525.58753709199" y="377.344213649852" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="a[0];&#xA;a[-1];" ShouldFocus="false">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.CodeBlockNodeModel>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="c24a8645-9d59-4b1b-9234-7fde1291c080" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="1815.79109792285" y="422.834421364985" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="values" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="fc5c85de-589e-4a66-91e2-2ae4a2dc1788" start_index="0" end="cc33e182-312b-4bbe-b47b-341a76392551" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="cc33e182-312b-4bbe-b47b-341a76392551" start_index="0" end="c1ab7aa6-bdaf-4453-bf34-3f891a499339" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="9d1c5f78-ab50-4103-b4a1-091bf2b5c414" start_index="0" end="b3fb51ad-2724-4687-bd54-3fdc8f2fa0a0" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="9d1c5f78-ab50-4103-b4a1-091bf2b5c414" start_index="0" end="fc5c85de-589e-4a66-91e2-2ae4a2dc1788" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="76f2a264-3114-4ea2-914c-4a888bcfd49e" start_index="0" end="cc33e182-312b-4bbe-b47b-341a76392551" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="b1d1378a-7078-4ba5-a159-e90c91d0d9e6" start_index="0" end="b3fb51ad-2724-4687-bd54-3fdc8f2fa0a0" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="b3fb51ad-2724-4687-bd54-3fdc8f2fa0a0" start_index="0" end="fc5c85de-589e-4a66-91e2-2ae4a2dc1788" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="c1ab7aa6-bdaf-4453-bf34-3f891a499339" start_index="0" end="8ecb5571-e537-4b58-a52b-21ebc1fc2b23" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="c1ab7aa6-bdaf-4453-bf34-3f891a499339" start_index="1" end="c24a8645-9d59-4b1b-9234-7fde1291c080" end_index="0" portType="0" />
+  </Connectors>
+  <Notes>
+    <Dynamo.Graph.Notes.NoteModel guid="08e1d490-2c57-4574-bb91-8585bb31d760" text="bridges the unability of the generic GetParameterValueByName node to deal with an array of elements and parameters" x="637.241960759168" y="419.318997864976" />
+    <Dynamo.Graph.Notes.NoteModel guid="7ffe367e-1ff7-457d-be9f-f87e5b243f2e" text="assigns parameter values to stations" x="1310.20425292995" y="460.898018100283" />
+  </Notes>
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="17.034891221023" eyeY="72.4416454683278" eyeZ="22.1939415043898" lookX="33.236946105957" lookY="-33.6270217895508" lookZ="-8.72614097595215" upX="0.512548863887787" upY="0.848048090934753" upZ="-0.134566321969032" />
+  </Cameras>
+</Workspace>

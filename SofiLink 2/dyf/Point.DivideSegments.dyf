@@ -1,0 +1,149 @@
+<Workspace Version="1.3.3.4111" X="-72.4899084761055" Y="347.911064819162" zoom="0.972726496566317" ScaleFactor="1" Name="Point.DivideSegments" Description="Returns nodes from nurbsspline according to suplied segment length" ID="f5586a1d-4a40-497c-ba89-a46f2eebc136" Category="SofiLink.Geometry">
+  <NamespaceResolutionMap>
+    <ClassMap partialName="Point" resolvedName="Autodesk.DesignScript.Geometry.Point" assemblyName="ProtoGeometry.dll" />
+  </NamespaceResolutionMap>
+  <Elements>
+    <PythonNodeModels.PythonNode guid="2b1e5d38-c584-4b03-a9d4-4c3564ed9f4f" type="PythonNodeModels.PythonNode" nickname="Point.DivideSegments" x="442.638575261987" y="-151.902628275246" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="2">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+#Assign your output to the OUT variable.
+lengths = [a[-1].X-a[0].X for a in IN[0]]
+hmin = IN[1]
+divisions = [round(length/hmin) for length in lengths]
+for i, division in enumerate(divisions):
+	if division == 0:
+		divisions[i] = 1
+
+OUT = divisions</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="430ca135-1529-4ece-bdba-2e79b726f17b" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="Points" x="391.467043969249" y="-336.115547221878" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="ProtoGeometry.dll" function="Autodesk.DesignScript.Geometry.NurbsCurve.ByPoints@Autodesk.DesignScript.Geometry.Point[]">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="38a22cf0-cdf2-4e3a-b8f4-ecf0e4bb7466" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="Curve.PointsAtEqualSegmentLength" x="720.267043969249" y="-295.115547221878" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="ProtoGeometry.dll" function="Autodesk.DesignScript.Geometry.Curve.PointsAtEqualSegmentLength@int">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="True" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <PythonNodeModels.PythonNode guid="8040ba40-60ac-4665-8430-78e253d7ef6a" type="PythonNodeModels.PythonNode" nickname="Segments.AddStartAndEndPoint" x="1034.00732558036" y="-174.432606006777" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="2">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+#Assign your output to the OUT variable.
+divisions = []
+for segment, ends in zip(IN[0],IN[1]):
+	ends.pop(1)
+	divisions.append([ends[0]] + segment + [ends[-1]])
+	
+OUT = divisions</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="9881b80e-0b75-43e1-a591-65767e9e75ae" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="87.0845899498252" y="-264.481978655251" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="segments:Point[][]" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="e9d8b130-5144-411b-8030-5537786dac8d" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="89.0983536408331" y="-200.810513585248" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="hmin:double = 1.0" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="aa1e9d89-fa4c-431c-a3a7-7f6ce6290b10" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="1791.17003893751" y="-238.499017415597" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="points" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="2ae81709-8f6a-4cc6-bc48-ffaca8f7fdd3" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="Flatten" x="1364.06348932607" y="-233.415222781332" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="BuiltIn" function="Flatten@var[]..[]">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="e7cf0402-3083-40dd-a1b3-6e1ed5c6c6ad" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="List.UniqueItems" x="1597.35262942775" y="-242.579458498928" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="DSCoreNodes.dll" function="DSCore.List.UniqueItems@var[]..[]">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="839b111b-05df-4a30-99fb-f00d45db1ab9" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="1796.86634954664" y="-23.9225846880722" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="stations" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="648abad6-9bc8-4c42-a10d-a973be010114" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="Curve.SegmentLengthAtParameter" x="833.535081909203" y="-28.8362447598649" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="true" assembly="ProtoGeometry.dll" function="Autodesk.DesignScript.Geometry.Curve.SegmentLengthAtParameter@double">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="True" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <PythonNodeModels.PythonNode guid="b1de987e-7491-4454-95c9-f971600ee554" type="PythonNodeModels.PythonNode" nickname="Stations" x="1138.25234336107" y="-26.4288806896366" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="1">
+      <PortInfo index="0" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+#Assign your output to the OUT variable.
+val = 0
+OUT = []
+for segment in IN[0]:
+	stations = [val + station for station in segment]
+	val += segment[-1]
+	OUT.append(stations)
+OUT</Script>
+    </PythonNodeModels.PythonNode>
+    <PythonNodeModels.PythonNode guid="c4ecbfef-6b34-4ddb-8e46-283b7a5e9fb1" type="PythonNodeModels.PythonNode" nickname="Parameters" x="607.876779561727" y="5.87451005587253" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="1">
+      <PortInfo index="0" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+#Assign your output to the OUT variable.
+OUT = []
+
+for length in IN[0]:
+	parameters = []
+	if length &gt;1:
+		for parameter in range(int(length)+1):
+			parameters.append(parameter/(length))
+	else:
+		parameters = [0, 1]
+	OUT.append(parameters)
+
+OUT</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="333c5011-9655-4e76-bfbd-b04e63bacd63" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="Flatten" x="1367.16075179243" y="-11.6434030177918" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="BuiltIn" function="Flatten@var[]..[]">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="92dd2e31-c633-4abb-adac-57d61bcbbf04" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="List.UniqueItems" x="1600.44989189411" y="-20.8076387353878" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="DSCoreNodes.dll" function="DSCore.List.UniqueItems@var[]..[]">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="2b1e5d38-c584-4b03-a9d4-4c3564ed9f4f" start_index="0" end="38a22cf0-cdf2-4e3a-b8f4-ecf0e4bb7466" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="2b1e5d38-c584-4b03-a9d4-4c3564ed9f4f" start_index="0" end="c4ecbfef-6b34-4ddb-8e46-283b7a5e9fb1" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="430ca135-1529-4ece-bdba-2e79b726f17b" start_index="0" end="38a22cf0-cdf2-4e3a-b8f4-ecf0e4bb7466" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="430ca135-1529-4ece-bdba-2e79b726f17b" start_index="0" end="648abad6-9bc8-4c42-a10d-a973be010114" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="38a22cf0-cdf2-4e3a-b8f4-ecf0e4bb7466" start_index="0" end="8040ba40-60ac-4665-8430-78e253d7ef6a" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="8040ba40-60ac-4665-8430-78e253d7ef6a" start_index="0" end="2ae81709-8f6a-4cc6-bc48-ffaca8f7fdd3" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="9881b80e-0b75-43e1-a591-65767e9e75ae" start_index="0" end="430ca135-1529-4ece-bdba-2e79b726f17b" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="9881b80e-0b75-43e1-a591-65767e9e75ae" start_index="0" end="2b1e5d38-c584-4b03-a9d4-4c3564ed9f4f" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="9881b80e-0b75-43e1-a591-65767e9e75ae" start_index="0" end="8040ba40-60ac-4665-8430-78e253d7ef6a" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="e9d8b130-5144-411b-8030-5537786dac8d" start_index="0" end="2b1e5d38-c584-4b03-a9d4-4c3564ed9f4f" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="2ae81709-8f6a-4cc6-bc48-ffaca8f7fdd3" start_index="0" end="e7cf0402-3083-40dd-a1b3-6e1ed5c6c6ad" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="e7cf0402-3083-40dd-a1b3-6e1ed5c6c6ad" start_index="0" end="aa1e9d89-fa4c-431c-a3a7-7f6ce6290b10" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="648abad6-9bc8-4c42-a10d-a973be010114" start_index="0" end="b1de987e-7491-4454-95c9-f971600ee554" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="b1de987e-7491-4454-95c9-f971600ee554" start_index="0" end="333c5011-9655-4e76-bfbd-b04e63bacd63" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="c4ecbfef-6b34-4ddb-8e46-283b7a5e9fb1" start_index="0" end="648abad6-9bc8-4c42-a10d-a973be010114" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="333c5011-9655-4e76-bfbd-b04e63bacd63" start_index="0" end="92dd2e31-c633-4abb-adac-57d61bcbbf04" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="92dd2e31-c633-4abb-adac-57d61bcbbf04" start_index="0" end="839b111b-05df-4a30-99fb-f00d45db1ab9" end_index="0" portType="0" />
+  </Connectors>
+  <Notes>
+    <Dynamo.Graph.Notes.NoteModel guid="51cac735-a101-4b4c-a225-8dd40ef2a40d" text="returns an array of procentual values based on the provided hmin value" x="374.505871569003" y="-61.0215954097741" />
+    <Dynamo.Graph.Notes.NoteModel guid="d2b4bb50-449b-46a5-a448-4be474c4bd18" text="similar to the succeeding node it returns the parameters of the curve" x="542.423838765246" y="70.8492038133663" />
+    <Dynamo.Graph.Notes.NoteModel guid="cbb79115-4667-4ca9-b488-ad6ec1083511" text="converts the segment length array to station values" x="1065.89599811443" y="36.1398581728436" />
+    <Dynamo.Graph.Notes.NoteModel guid="6eca0e95-b732-4f02-ad0d-f0e7a79f603c" text="adds the start and end point to the array of points" x="1002.52164729797" y="-83.2208671616257" />
+  </Notes>
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="17.03489112854" eyeY="72.4416427612305" eyeZ="22.193941116333" lookX="33.236946105957" lookY="-33.6270217895508" lookZ="-8.72614097595215" upX="0.512548863887787" upY="0.848048090934753" upZ="-0.134566321969032" />
+  </Cameras>
+</Workspace>
