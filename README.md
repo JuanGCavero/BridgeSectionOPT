@@ -32,8 +32,6 @@ The Optimization, in a simillar way, contains Dynamo scripts to define the bridg
 
 ## Acknowledgments
 
-My friends:
-
 * **Jan Frölich**
 * **Felipe Trovatti**
 
